@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Return Predictor · E-Commerce Intelligence</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">🛡️</div>
+    <div>
+      <h1>Return Predictor</h1>
+      <p>E-Commerce Intelligence</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="model-tag">Model: {{ model_name }}</span>
+    <span class="ml-badge">ML Powered</span>
+  </div>
+</header>
+
+{% if error %}
+<div class="banner-error">
+  ⚠ {{ error }}
+</div>
+{% endif %}
+
+<main class="layout">
+
+  <!-- LEFT: FORM -->
+  <section class="card form-card">
+    <h2 class="card-title">📝 Order Details</h2>
+
+    <form id="predict-form">
+
+      <fieldset>
+        <legend>📦 PRODUCT</legend>
+        <div class="grid-2">
+          <div class="field">
+            <label for="product_category">Category</label>
+            <select id="product_category" name="product_category"></select>
+          </div>
+          <div class="field">
+            <label for="sub_category">Sub-category</label>
+            <select id="sub_category" name="sub_category"></select>
+          </div>
+          <div class="field">
+            <label for="brand">Brand</label>
+            <select id="brand" name="brand"></select>
+          </div>
+          <div class="field">
+            <label for="price">Price (₹)</label>
+            <input type="number" id="price" name="price" value="500" min="0" step="1" />
+          </div>
+          <div class="field">
+            <label for="discount_percent">Discount %</label>
+            <input type="number" id="discount_percent" name="discount_percent" value="15" min="0" max="100" step="0.1" />
+          </div>
+          <div class="field">
+            <label for="product_rating">Rating</label>
+            <input type="number" id="product_rating" name="product_rating" value="4.2" min="0" max="5" step="0.1" />
+          </div>
+          <div class="field">
+            <label for="review_count">Review Count</label>
+            <input type="number" id="review_count" name="review_count" value="120" min="0" step="1" />
+          </div>
+          <div class="field">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" step="1" />
+          </div>
+          <div class="field toggle-field">
+            <label for="fragile_item">Fragile</label>
+            <label class="switch">
+              <input type="checkbox" id="fragile_item" name="fragile_item" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field toggle-field">
+            <label for="warranty_available">Warranty</label>
+            <label class="switch">
+              <input type="checkbox" id="warranty_available" name="warranty_available" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>📊 RISK RATES</legend>
+        <div class="grid-2">
+          <div class="field">
+            <label for="product_return_rate">Product Return Rate</label>
+            <input type="number" id="product_return_rate" name="product_return_rate" value="0.12" min="0" max="1" step="0.001" />
+          </div>
+          <div class="field">
+            <label for="category_return_rate">Category Return Rate</label>
+            <input type="number" id="category_return_rate" name="category_return_rate" value="0.18" min="0" max="1" step="0.001" />
+          </div>
+          <div class="field">
+            <label for="brand_return_rate">Brand Return Rate</label>
+            <input type="number" id="brand_return_rate" name="brand_return_rate" value="0.1" min="0" max="1" step="0.001" />
+          </div>
+          <div class="field">
+            <label for="defect_rate">Defect Rate</label>
+            <input type="number" id="defect_rate" name="defect_rate" value="0.03" min="0" max="1" step="0.001" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>🚚 SELLER &amp; LOGISTICS</legend>
+        <div class="grid-2">
+          <div class="field">
+            <label for="seller_rating">Seller Rating</label>
+            <input type="number" id="seller_rating" name="seller_rating" value="4.5" min="0" max="5" step="0.1" />
+          </div>
+          <div class="field">
+            <label for="seller_return_rate">Seller Return Rate</label>
+            <input type="number" id="seller_return_rate" name="seller_return_rate" value="0.08" min="0" max="1" step="0.001" />
+          </div>
+          <div class="field">
+            <label for="fulfillment_type">Fulfillment</label>
+            <select id="fulfillment_type" name="fulfillment_type">
+              <option>Marketplace Fulfilled</option>
+              <option>Seller Fulfilled</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="shipping_distance_km">Distance (km)</label>
+            <input type="number" id="shipping_distance_km" name="shipping_distance_km" value="250" min="0" step="1" />
+          </div>
+          <div class="field toggle-field">
+            <label for="delayed_delivery">Delayed Delivery</label>
+            <label class="switch">
+              <input type="checkbox" id="delayed_delivery" name="delayed_delivery" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>👤 CUSTOMER</legend>
+        <div class="grid-2">
+          <div class="field">
+            <label for="payment_method">Payment</label>
+            <select id="payment_method" name="payment_method">
+              <option>Credit Card</option>
+              <option>COD</option>
+              <option>UPI</option>
+              <option>Debit Card</option>
+              <option>Wallet</option>
+            </select>
+          </div>
+          <div class="field toggle-field">
+            <label for="wishlist_before_purchase">Wishlisted</label>
+            <label class="switch">
+              <input type="checkbox" id="wishlist_before_purchase" name="wishlist_before_purchase" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="product_page_views">Page Views</label>
+            <input type="number" id="product_page_views" name="product_page_views" value="35" min="0" step="1" />
+          </div>
+          <div class="field">
+            <label for="support_calls">Support Calls</label>
+            <input type="number" id="support_calls" name="support_calls" value="1" min="0" step="1" />
+          </div>
+          <div class="field">
+            <label for="chat_messages">Chat Messages</label>
+            <input type="number" id="chat_messages" name="chat_messages" value="0" min="0" step="1" />
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="btn-predict">⚡ Predict</button>
+        <button type="reset" class="btn-reset" id="reset-btn">Reset</button>
+      </div>
+    </form>
+
+    <div class="card result-card">
+      <h2 class="card-title">Prediction Result</h2>
+      <div id="result-empty" class="result-empty">Fill in the order details and click Predict.</div>
+      <div id="result-content" class="result-content" hidden>
+        <svg viewBox="0 0 200 120" class="gauge">
+          <path class="gauge-track" d="M20,110 A80,80 0 0 1 180,110" />
+          <path class="gauge-value" id="gauge-arc" d="M20,110 A80,80 0 0 1 180,110" />
+        </svg>
+        <div class="gauge-label">
+          <span id="gauge-percent">0%</span>
+        </div>
+        <div id="risk-badge" class="risk-badge">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: MODEL INFO -->
+  <aside class="side-col">
+    <div class="card">
+      <h2 class="card-title">📈 Model Performance</h2>
+      <div class="metric">
+        <div class="metric-row"><span>Accuracy</span><b>{{ (metrics.get('Accuracy', 0) * 100) | round(1) }}%</b></div>
+        <div class="bar"><div class="bar-fill accuracy" style="width: {{ (metrics.get('Accuracy', 0) * 100) | round(1) }}%"></div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-row"><span>Precision</span><b>{{ (metrics.get('Precision', 0) * 100) | round(1) }}%</b></div>
+        <div class="bar"><div class="bar-fill precision" style="width: {{ (metrics.get('Precision', 0) * 100) | round(1) }}%"></div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-row"><span>Recall</span><b>{{ (metrics.get('Recall', 0) * 100) | round(1) }}%</b></div>
+        <div class="bar"><div class="bar-fill recall" style="width: {{ (metrics.get('Recall', 0) * 100) | round(1) }}%"></div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-row"><span>F1</span><b>{{ (metrics.get('F1', 0) * 100) | round(1) }}%</b></div>
+        <div class="bar"><div class="bar-fill f1" style="width: {{ (metrics.get('F1', 0) * 100) | round(1) }}%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">✨ Top Feature Importance</h2>
+      <ul class="feature-list">
+        {% for f in feature_importance %}
+        <li><span>{{ f.feature }}</span><b>{{ f.importance | round(2) }}</b></li>
+        {% else %}
+        <li class="muted">Load a model to see feature importance.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </aside>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
